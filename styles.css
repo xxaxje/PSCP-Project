@@ -1,0 +1,86 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-content: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .title{
+      text-align: left;
+  }
+  
+  nav {
+    background-color: #333; /* Background color of the navigation bar */
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    color: #fff; /* Text color for the title and button */
+    position: fixed; /* This will fix position of nav bar */
+    justify-content: space-between; /* To push the title and button to the opposite sides */
+  }
+  
+  .navbar-left h1 {
+    margin: 0;
+  }
+  
+  .navbar-right a {
+    text-decoration: none;
+    /* background-color: #ff8809; Background color of the button */
+    color: #fff; /* Text color for the button */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: .5s ease;
+  }
+  /* Add the background image to the desired section */
+  #home {
+    color: #000000; /* Set text color for better visibility */
+    height: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-shadow: #000000;
+  }
+
+  #home a{
+    text-decoration: none;
+    background-color: #fff;
+    color: #000; /* Text color for the button */
+    border: none;
+    padding: 80px 120px;
+    border-radius: 30PX;
+    cursor: pointer;
+    transition: .5s ease;
+  }
+
+  #home a:hover{
+    text-decoration: none;
+    background-color: #000;
+    color: #fff; /* Text color for the button */
+    border: none;
+    padding: 80px 120px;
+    border-radius: 30PX;
+    cursor: pointer;
+    transition: .5s;
+  }
+  .navbar-right a:hover{
+    background-color: #156d39; /* Background color of the button */
+    color: #fff; /* Text color for the button */
+    border: none;
+    transform: scale(1.2);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: .5s;
+  }
+  .active {
+    background-color: #9e2626;
+  }
+
+  .inactive {
+    background-color: #ff8809;
+  }
