@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Request</title>
+    <link rel="stylesheet" href="send_request.css">
+</head>
+<body>
+    <div class="request-container">
+        <h2>SEND REQUEST</h2>
+        <form id="requestForm">
+            <select id="building" required>
+                <option value="">BUILDING</option>
+                <option value="A1">A1</option>
+                <option value="A2">A2</option>
+                <option value="A3">A3</option>
+                <option value="B1">B1</option>
+                <option value="B2">B2</option>
+                <option value="B3">B3</option>
+                <option value="C1">C1</option>
+                <option value="C2">C2</option>
+                <option value="C3">C3</option>
+            </select>
+            <select id="floor" required>
+                <option value="">FLOOR</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+            <select id="room" required>
+                <option value="">ROOM</option>
+            </select>
+            <button type="submit" class="submit-btn">SUBMIT</button>
+        </form>
+    </div>
+    <script src="send_request.js"></script>
+</body>
+</html>
