@@ -9,43 +9,58 @@ body {
     background-image: url('renovate-building.jpg');
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
 }
 
-.container {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
 }
 
 .login-container {
-    background-color: rgba(255, 255, 255, 0.8);
+    position: relative;
+    z-index: 2;
+    background-color: rgba(255, 255, 255, 0.9);
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
-}
-input {
-    width: 95%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    align-items: center;
+    width: 100%;
+    max-width: 400px;
 }
 
-buttonlogin {
-    padding: 10px;
-    width: 20%;
+h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+form input {
+    width: 94%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+form button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
     border: none;
+    border-radius: 5px;
     background-color: #28a745;
     color: white;
-    border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
 
-button:hover {
+form button:hover {
     background-color: #218838;
 }
