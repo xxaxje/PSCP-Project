@@ -3,6 +3,7 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
@@ -11,7 +12,24 @@ def get_db_connection():
 
 with app.app_context():
     conn = get_db_connection()
-    conn.execute()
+    conn.execute('''CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    email TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL,
+                    role TEXT NOT NULL CHECK(role IN ('guest', 'owner'))
+                )''')
+    predefined_owners = [
+        ('67070163@kmitl.ac.th', '67070162', 'owner'),
+        ('gonggiz@gmail.com', 'gonglnwza007', 'owner')
+    ]   
+
+    for email, password, role in predefined_owners:
+        try:
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+            conn.execute('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', (email, hashed_password, role))
+        except sqlite3.IntegrityError:
+            pass
+
     conn.commit()
     conn.close()
 
@@ -23,9 +41,8 @@ def index():
 def signup():
     if request.method == 'POST':
         email = request.form['email']
-        password = generate_password_hash(request.form['password'])
+        password = generate_password_hash(request.form['password'], method='pbkdf2:sha256')
         role = 'guest'
-
         conn = get_db_connection()
         try:
             conn.execute('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', (email, password, role))
@@ -51,25 +68,25 @@ def login():
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
             session['role'] = user['role']
-            if user['role'] == 'guest':
-                return redirect(url_for('send_request'))
+            if user['role'] == 'owner':
+                return redirect(url_for('checkrequests'))
             else:
-                return redirect(url_for('check_requests'))
+                return redirect(url_for('sendrequest'))
         else:
             flash('Invalid email or password.')
     return render_template('login.html')
 
-@app.route('/send_request')
-def send_request():
+@app.route('/sendrequest')
+def sendrequest():
     if 'user_id' not in session or session.get('role') != 'guest':
         return redirect(url_for('login'))
-    return render_template('send_request.html')
+    return render_template('sendrequest.html')
 
-@app.route('/check_requests')
-def check_requests():
+@app.route('/checkrequests')
+def checkrequests():
     if 'user_id' not in session or session.get('role') != 'owner':
         return redirect(url_for('login'))
-    return "This page is for owners only."
+    return render_template('checkrequest.html')
 
 @app.route('/logout')
 def logout():

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Requests from Guests</h1>
+    <ul>
+        {% for guest in guest_requests %}
+            <li>{{ guest.email }} requested for room {{ guest.room }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

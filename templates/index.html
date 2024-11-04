@@ -14,8 +14,8 @@
     </div>
 
     <div class="button-container">
-        <button class="btn-guest" onclick="window.location.href='signup.html'">Guest</button>
-        <button class="btn-owner" onclick="window.location.href='login.html'">Owner</button>
+        <button class="btn-guest" onclick="window.location.href='{{ url_for('signup') }}';">Guest</button>
+        <button class="btn-owner" onclick="window.location.href='{{ url_for('login') }}';">Owner</button>
     </div>
 </body>
 </html>
