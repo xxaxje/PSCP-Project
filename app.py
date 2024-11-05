@@ -31,8 +31,8 @@ with app.app_context():
                     FOREIGN KEY(owner_id) REFERENCES users(id)
                 )''')
     predefined_owners = [
-        ('67070163@kmitl.ac.th', '67070163', 'owner', 'A1-201'),
-        ('gonggiz@gmail.com', 'gonglnwza007', 'owner', 'A2-102')
+        ('67070163@kmitl.ac.th', '67070163', 'owner', 'A1-101'),
+        ('gonggiz@gmail.com', 'gonglnwza007', 'owner', 'A1-102')
     ]
 
     for email, password, role, room in predefined_owners:
@@ -44,8 +44,6 @@ with app.app_context():
             pass
     conn.commit()
     conn.close()
-
-
 
 @app.route('/')
 def index():
@@ -82,6 +80,7 @@ def login():
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
             session['role'] = user['role']
+            session['user_email'] = user['email']
             if user['role'] == 'owner':
                 return redirect(url_for('checkrequests'))
             else:
@@ -100,8 +99,8 @@ def sendrequest():
         floor = request.form['floor']
         room = request.form['room']
         conn = get_db_connection()
-        owner = conn.execute('SELECT * FROM users WHERE role = "owner" AND room = ?', (f"{building}-{room}",)).fetchone()
-
+        owner = conn.execute('SELECT * FROM users WHERE role = "owner" AND room = ?', (f"{room}",)).fetchone()
+#####เหลือตรงนี้TTTT
         if owner:
             conn.execute(
                 'INSERT INTO requests (guest_id, owner_id, building, floor, room) VALUES (?, ?, ?, ?, ?)',
@@ -109,23 +108,36 @@ def sendrequest():
             )
             conn.commit()
             flash('Request sent successfully!')
-            return redirect(url_for('checkrequests', email=owner['email']))
+            return redirect(url_for('checkrequests'))
         else:
             flash('Room not found or does not match any owner.')
         
         conn.close()
+
     return render_template('sendrequest.html')
+
+@app.route('/update_request_status/<int:request_id>', methods=['POST'])
+def update_request_status(request_id):
+    if 'user_id' not in session or session.get('role') != 'owner':
+        return redirect(url_for('login')) 
+    
+    status = request.form.get('status')
+    conn = get_db_connection()
+    conn.execute('UPDATE requests SET status = ? WHERE id = ?', (status, request_id))
+    conn.commit()
+    conn.close()
+    
+    flash('Request status updated successfully!')
+    return redirect(url_for('checkrequests'))
 
 @app.route('/checkrequests')
 def checkrequests():
     if 'user_id' not in session or session.get('role') != 'owner':
         return redirect(url_for('login')) 
-    email = request.args.get('email')
     conn = get_db_connection()
     requests = conn.execute('SELECT * FROM requests WHERE owner_id = ?', (session['user_id'],)).fetchall()
     conn.close()
-    return render_template('checkrequest.html', email=email, requests=requests)
-
+    return render_template('checkrequest.html', requests=requests)
 
 @app.route('/logout')
 def logout():

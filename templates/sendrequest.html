@@ -9,8 +9,19 @@
 <body>
     <div class="request-container">
         <h2>SEND REQUEST</h2>
-        <form id="requestForm">
-            <select id="building" required>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('sendrequest') }}">
+            <select name="building" id="building" required>
                 <option value="">BUILDING</option>
                 <option value="A1">A1</option>
                 <option value="A2">A2</option>
@@ -22,19 +33,19 @@
                 <option value="C2">C2</option>
                 <option value="C3">C3</option>
             </select>
-            <select id="floor" required>
+            <select name="floor" id="floor" required>
                 <option value="">FLOOR</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
             </select>
-            <select id="room" required>
+            <select name="room" id="room" required>
                 <option value="">ROOM</option>
             </select>
             <button type="submit" class="submit-btn">SUBMIT</button>
         </form>
-    </div>
+    </div>    
     <script src="{{ url_for('static', filename='js/send_request.js') }}"></script>
 </body>
 </html>
