@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Check Requests</title>
 </head>
 <body>
-    <h1>Requests from Guests</h1>
-    <ul>
-        {% for guest in guest_requests %}
-            <li>{{ guest.email }} requested for room {{ guest.room }}</li>
-        {% endfor %}
-    </ul>
+    <h2>Check Request</h2>
+    <p>Email: {{ email }}</p>
+    <div>
+        <h3>Request Details</h3>
+        <p>Guest ID: {{ request.guest_id }}</p>
+        <p>Building: {{ request.building }}</p>
+        <p>Floor: {{ request.floor }}</p>
+        <p>Room: {{ request.room }}</p>
+        <form action="{{ url_for('update_request_status', request_id=request.id) }}" method="POST">
+            <button type="submit" name="status" value="accepted" style="background-color: green; color: white;">Accept</button>
+            <button type="submit" name="status" value="declined" style="background-color: red; color: white;">Decline</button>
+        </form>
+    </div>
 </body>
 </html>
