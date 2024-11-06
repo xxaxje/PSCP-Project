@@ -21,6 +21,15 @@ body {
     z-index: 1;
 }
 
+.flash-message {
+    background-color: #ffcccc;
+    color: #cc0000;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
 .login-container {
     position: relative;
     z-index: 2;
