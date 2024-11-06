@@ -6,12 +6,14 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 def get_db_connection():
+    # ฟังก์ชันสำหรับเชื่อมต่อกับฐานข้อมูล SQLite
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
 
 with app.app_context():
     conn = get_db_connection()
+    # สร้างตาราง users
     conn.execute('''CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     email TEXT UNIQUE NOT NULL,
@@ -19,6 +21,7 @@ with app.app_context():
                     role TEXT NOT NULL CHECK(role IN ('guest', 'owner')),
                     room TEXT
                 )''')
+    # สร้างตาราง requests
     conn.execute('''CREATE TABLE IF NOT EXISTS requests (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     guest_id INTEGER NOT NULL,
@@ -30,6 +33,7 @@ with app.app_context():
                     FOREIGN KEY(guest_id) REFERENCES users(id),
                     FOREIGN KEY(owner_id) REFERENCES users(id)
                 )''')
+
     predefined_owners = [
         ('67070163@kmitl.ac.th', '67070163', 'owner', 'A1-101'),
         ('gonggiz@gmail.com', 'gonglnwza007', 'owner', 'A1-102')
@@ -58,6 +62,7 @@ def signup():
         role = 'guest'
         conn = get_db_connection()
         try:
+            # บันทึกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล
             conn.execute('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', (email, password, role))
             conn.commit()
             flash('Sign up successful! Please log in.')
@@ -78,10 +83,12 @@ def login():
         user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
         conn.close()
 
+        # ตรวจสอบว่ามีผู้ใช้งานและรหัสผ่านถูกต้องหรือไม่
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
             session['role'] = user['role']
             session['user_email'] = user['email']
+            # ตรวจสอบ role ของผู้ใช้ และส่งไปยังหน้าตาม role
             if user['role'] == 'owner':
                 return redirect(url_for('checkrequests'))
             else:
@@ -103,6 +110,7 @@ def sendrequest():
         owner = conn.execute('SELECT * FROM users WHERE role = "owner" AND room = ?', (f"{room}",)).fetchone()
 
         if owner:
+            # บันทึกข้อมูลการขออนุญาตในฐานข้อมูล
             conn.execute(
                 'INSERT INTO requests (guest_id, owner_id, building, floor, room) VALUES (?, ?, ?, ?, ?)',
                 (session['user_id'], owner['id'], building, floor, room)
@@ -112,11 +120,9 @@ def sendrequest():
             return redirect(url_for('sendrequest_status'))
         else:
             flash('Room not found or does not match any owner.')
-        
         conn.close()
 
     return render_template('sendrequest.html')
-
 
 @app.route('/sendrequest/status')
 def sendrequest_status():
@@ -124,6 +130,7 @@ def sendrequest_status():
         return redirect(url_for('login'))
 
     conn = get_db_connection()
+    # ดึงข้อมูลคำขอล่าสุดสำหรับ guest ที่ login อยู่
     request_data = conn.execute(
         '''
         SELECT building, floor, room, status
@@ -137,22 +144,19 @@ def sendrequest_status():
     
     return render_template('sendrequest_status.html', request_data=request_data)
 
-
 @app.route('/request_status')
 def request_status():
+    # ดึงข้อมูลมาแสดง
     building = request.args.get('building')
     floor = request.args.get('floor')
     room = request.args.get('room')
     status = request.args.get('status')
-    
     return render_template('request_status.html', building=building, floor=floor, room=room, status=status)
-
 
 @app.route('/update_request_status/<int:request_id>', methods=['POST'])
 def update_request_status(request_id):
     if 'user_id' not in session or session.get('role') != 'owner':
-        return redirect(url_for('login')) 
-    
+        return redirect(url_for('login'))
     status = request.form.get('status')
     conn = get_db_connection()
     conn.execute('UPDATE requests SET status = ? WHERE id = ?', (status, request_id))
@@ -165,9 +169,9 @@ def update_request_status(request_id):
 @app.route('/checkrequests')
 def checkrequests():
     if 'user_id' not in session or session.get('role') != 'owner':
-        return redirect(url_for('login')) 
+        return redirect(url_for('login'))
+
     conn = get_db_connection()
-    
     requests = conn.execute('''
         SELECT requests.*, users.email AS guest_email 
         FROM requests 
@@ -184,4 +188,4 @@ def logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
