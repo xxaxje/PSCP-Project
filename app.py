@@ -100,7 +100,7 @@ def sendrequest():
         room = request.form['room']
         conn = get_db_connection()
         owner = conn.execute('SELECT * FROM users WHERE role = "owner" AND room = ?', (f"{room}",)).fetchone()
-#####เหลือตรงนี้TTTT
+
         if owner:
             conn.execute(
                 'INSERT INTO requests (guest_id, owner_id, building, floor, room) VALUES (?, ?, ?, ?, ?)',
@@ -108,13 +108,44 @@ def sendrequest():
             )
             conn.commit()
             flash('Request sent successfully!')
-            return redirect(url_for('checkrequests'))
+            return redirect(url_for('sendrequest_status'))
         else:
             flash('Room not found or does not match any owner.')
         
         conn.close()
 
     return render_template('sendrequest.html')
+
+
+@app.route('/sendrequest/status')
+def sendrequest_status():
+    if 'user_id' not in session or session.get('role') != 'guest':
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    request_data = conn.execute(
+        '''
+        SELECT building, floor, room, status
+        FROM requests
+        WHERE guest_id = ?
+        ORDER BY id DESC
+        LIMIT 1
+        ''', (session['user_id'],)
+    ).fetchone()
+    conn.close()
+    
+    return render_template('sendrequest_status.html', request_data=request_data)
+
+
+@app.route('/request_status')
+def request_status():
+    building = request.args.get('building')
+    floor = request.args.get('floor')
+    room = request.args.get('room')
+    status = request.args.get('status')
+    
+    return render_template('request_status.html', building=building, floor=floor, room=room, status=status)
+
 
 @app.route('/update_request_status/<int:request_id>', methods=['POST'])
 def update_request_status(request_id):
@@ -135,7 +166,14 @@ def checkrequests():
     if 'user_id' not in session or session.get('role') != 'owner':
         return redirect(url_for('login')) 
     conn = get_db_connection()
-    requests = conn.execute('SELECT * FROM requests WHERE owner_id = ?', (session['user_id'],)).fetchall()
+    
+    requests = conn.execute('''
+        SELECT requests.*, users.email AS guest_email 
+        FROM requests 
+        JOIN users ON requests.guest_id = users.id 
+        WHERE owner_id = ?
+    ''', (session['user_id'],)).fetchall()
+    
     conn.close()
     return render_template('checkrequest.html', requests=requests)
 
