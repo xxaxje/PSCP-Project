@@ -11,6 +11,7 @@ body {
     background-image: url('renovate-building.jpg');
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
 }
 
 .overlay {

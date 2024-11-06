@@ -42,6 +42,7 @@ with app.app_context():
                          (email, hashed_password, role, room))
         except sqlite3.IntegrityError:
             pass
+
     conn.commit()
     conn.close()
 
